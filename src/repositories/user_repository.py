@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, exists
 from typing import Dict, Any, Optional
 
 from src.entities.user import User
@@ -20,6 +20,12 @@ class UserRepository:
             select(User).where(User.email == email)
         )
         return result.scalar_one_or_none()
+    
+    async def exists_by_email(self, email: str) -> bool:
+        result = await self.db.execute(
+            select(exists().where(User.email == email))
+        )
+        return result.scalar()
     
     async def create(self, create_data: Dict[str, Any]) -> User:
         user = User(**create_data)
