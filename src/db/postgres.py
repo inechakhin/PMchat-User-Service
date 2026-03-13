@@ -11,7 +11,7 @@ DATABASE_URL = (
 
 engine = create_async_engine(
     DATABASE_URL,
-    echo=True,  # для отладки, в production лучше выключить
+    echo=False,  # Trur для отладки, False для production
     future=True,
     pool_size=5,
     max_overflow=5,
