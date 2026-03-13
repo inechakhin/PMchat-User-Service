@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, exists
 from typing import Dict, Any, Optional
 
-from src.entities.user import User
+from entities.user import User
 
 class UserRepository:
     
@@ -39,6 +39,7 @@ class UserRepository:
             if value is not None:
                 setattr(user, key, value)
         await self.db.commit()
+        await self.db.refresh(user)
         return user
 
     async def delete(self, user: User) -> None:
