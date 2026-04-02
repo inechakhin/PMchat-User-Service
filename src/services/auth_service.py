@@ -26,7 +26,7 @@ class AuthService:
     def _verify_password(self, plain: str, hashed: str) -> bool:
         return self.password_hash.verify(plain, hashed)
     
-    def _create_access_token(self, data: dict, expires_delta: timedelta | None = None):
+    def _create_access_token(self, data: dict, expires_delta: timedelta | None = None) -> str:
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.now(timezone.utc) + expires_delta
@@ -35,7 +35,7 @@ class AuthService:
         to_encode.update({"exp": expire, "type": "access"})
         return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
-    def _create_refresh_token(self, data: dict, expires_delta: timedelta | None = None):
+    def _create_refresh_token(self, data: dict, expires_delta: timedelta | None = None) -> str:
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.now(timezone.utc) + expires_delta
