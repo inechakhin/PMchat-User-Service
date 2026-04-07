@@ -7,7 +7,6 @@ from repositories.user_repository import UserRepository
 from schemas.auth import (
     SignUpRequest,
     SignInRequest,
-    RefreshRequest,
     JwtAuthResponse,
 )
 from core.exceptions.user_error import UserExistError, UserNotFoundError
@@ -67,8 +66,8 @@ class AuthService:
         
         return self._create_jwt_auth_response(user.jwt_subject)
 
-    async def refresh(self, request: RefreshRequest) -> JwtAuthResponse:
-        payload = jwt.decode(request.refresh_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+    async def refresh(self, refresh_token: str) -> JwtAuthResponse:
+        payload = jwt.decode(refresh_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         if payload.get("type") != "refresh":
             raise InvalidTokenError()
         user_id = int(payload.get("id"))
