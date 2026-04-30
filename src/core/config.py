@@ -16,7 +16,7 @@ class Config(BaseSettings):
     POSTGRES_DB: str = Field("pmchat_user_postgres", env="POSTGRES_DB")
     
     # JWT
-    SECRET_KEY: str = Field("222super_secret_key222", env="SECRET_KEY")
+    SECRET_KEY: str | None = Field(None, env="SECRET_KEY")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
