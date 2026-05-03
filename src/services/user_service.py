@@ -1,6 +1,6 @@
 from repositories.user_repository import UserRepository
 from schemas.user import (
-    UserResponse, 
+    UserResponse,
     UserUpdateRequest,
 )
 from core.exceptions.user_error import UserNotFoundError

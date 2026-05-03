@@ -9,14 +9,14 @@ class Config(BaseSettings):
     LOGS_DIR: Path = BASE_DIR / "logs"
 
     # Postgres
-    POSTGRES_HOST: str = Field("localhost", env="POSTGRES_HOST")
-    POSTGRES_PORT: int = Field(5432, env="POSTGRES_PORT")
-    POSTGRES_USER: str | None = Field(None, env="POSTGRES_USER")
-    POSTGRES_PASSWORD: str | None = Field(None, env="POSTGRES_PASSWORD")
-    POSTGRES_DB: str = Field("pmchat_user_postgres", env="POSTGRES_DB")
+    POSTGRES_HOST: str = Field("localhost", validation_alias="POSTGRES_HOST")
+    POSTGRES_PORT: int = Field(5432, validation_alias="POSTGRES_PORT")
+    POSTGRES_USER: str | None = Field(None, validation_alias="POSTGRES_USER")
+    POSTGRES_PASSWORD: str | None = Field(None, validation_alias="POSTGRES_PASSWORD")
+    POSTGRES_DB: str = Field("pmchat_user_postgres", validation_alias="POSTGRES_DB")
     
     # JWT
-    SECRET_KEY: str | None = Field(None, env="SECRET_KEY")
+    SECRET_KEY: str | None = Field(None, validation_alias="SECRET_KEY")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
