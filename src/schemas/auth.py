@@ -12,9 +12,6 @@ class SignInRequest(BaseModel):
     email: EmailStr
     password: str
     
-class RefreshRequest(BaseModel):
-    refresh_token: str
-    
 class JwtAuthResponse(BaseModel):
     access_token: str
     refresh_token: str
