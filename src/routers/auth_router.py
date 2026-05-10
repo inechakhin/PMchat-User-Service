@@ -1,17 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 
 from schemas.auth import (
     SignUpRequest,
     SignInRequest,
-    RefreshRequest,
     JwtAuthResponse,
 )
 from services.auth_service import AuthService
-from dependencies.auth import get_auth_service
+from dependencies.auth import get_auth_service, get_refresh_token
 from core.exceptions.user_error import UserExistError, UserNotFoundError
 from core.exceptions.auth_error import InvalidCredentialError
 from jwt.exceptions import InvalidTokenError
-
 from utils.logging import logger
 
 auth_router = APIRouter(prefix="/internal/api/auth", tags=["auth"])
@@ -41,7 +40,8 @@ async def signin(
     auth_service: AuthService = Depends(get_auth_service),
 ):
     try:
-        return await auth_service.signin(request)
+        tokens = await auth_service.signin(request)
+        return _build_auth_response("authenticated", tokens)
     except UserNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -62,11 +62,12 @@ async def signin(
 
 @auth_router.post("/refresh", response_model=JwtAuthResponse)
 async def refresh(
-    request: RefreshRequest,
+    refresh_token: str = Depends(get_refresh_token),
     auth_service: AuthService = Depends(get_auth_service),
 ):
     try:
-        return await auth_service.refresh(request)
+        tokens = await auth_service.refresh(refresh_token)
+        return _build_auth_response("refreshed", tokens)
     except InvalidTokenError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -84,3 +85,31 @@ async def refresh(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error",
         )
+       
+@auth_router.post("/logout")
+async def logout():
+    return _build_auth_response("logged out", None)
+ 
+def _build_auth_response(status: str, tokens: JwtAuthResponse):
+    response = JSONResponse(content={"status": status})
+    if tokens is None:
+        response.delete_cookie("access_token")
+        response.delete_cookie("refresh_token")
+    else:
+        response.set_cookie(
+            key="access_token",
+            value=tokens.access_token,
+            httponly=True,
+            secure=True,
+            samesite="lax",
+            max_age=15 * 60, # 15 минут
+        )
+        response.set_cookie(
+            key="refresh_token",
+            value=tokens.refresh_token,
+            httponly=True,
+            secure=True,
+            samesite="lax",
+            max_age=7 * 24 * 3600, # 7 дней
+        )
+    return response
